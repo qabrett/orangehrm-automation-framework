@@ -44,6 +44,13 @@
             <version>7.15.0</version>
         </dependency>
 
+        <!-- Cucumber PicoContainer for dependency injection between step classes -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-picocontainer</artifactId>
+            <version>7.15.0</version>
+        </dependency>
+
         <!-- TestNG -->
         <dependency>
             <groupId>org.testng</groupId>
