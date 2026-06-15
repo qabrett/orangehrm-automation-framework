@@ -21,14 +21,15 @@ public class ObjectMap {
     private final Properties properties;
 
     /**
-     * Loads the locator repository from the given file.
+     * Loads the locator repository from a classpath resource.
      *
-     * @param fileName path to the locator .properties file
-     * @throws IllegalStateException if the file cannot be read
+     * @param resourceName name of the locator .properties resource on the
+     *                     classpath, e.g. {@code locators.properties}
+     * @throws IllegalStateException if the resource cannot be found or read
      */
-    public ObjectMap(String fileName) {
-        this.properties = PropertiesLoader.load(fileName);
-        log.info("Loaded {} locators from {}", properties.size(), fileName);
+    public ObjectMap(String resourceName) {
+        this.properties = PropertiesLoader.loadFromClasspath(resourceName);
+        log.info("Loaded {} locators from classpath resource {}", properties.size(), resourceName);
     }
 
     /**
