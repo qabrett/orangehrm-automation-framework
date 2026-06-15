@@ -1,52 +1,43 @@
 package com.orangehrm.utils;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Properties;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * A utility class for reading properties from a file.
+ * Reads configuration values (URLs, credentials, browser, timeouts) from a
+ * .properties file.
  */
 public class PropertyReader {
 
     private static final Logger log = LogManager.getLogger(PropertyReader.class);
+
     private final Properties properties;
 
     /**
-     * Constructs a new PropertyReader object and loads the properties from the
-     * specified file.
+     * Loads configuration from the given file.
      *
-     * @param propertiesFilePath the name of the properties file to read
+     * @param propertiesFilePath path to the config .properties file
+     * @throws IllegalStateException if the file cannot be read
      */
     public PropertyReader(String propertiesFilePath) {
-        properties = new Properties();
-        try (FileInputStream fis = new FileInputStream(propertiesFilePath)) {
-            properties.load(fis);
-            log.debug("Loaded property file path: {}", propertiesFilePath);
-        } catch (IOException e) {
-            String message = "Failed to load property file path: " + propertiesFilePath;
-            log.error(message, e);
-            throw new RuntimeException(message, e);
-        }
+        this.properties = PropertiesLoader.load(propertiesFilePath);
+        log.info("Loaded {} config properties from {}", properties.size(), propertiesFilePath);
     }
 
     /**
-     * Retrieves the value of the specified property from the properties file.
+     * Retrieves a configuration value by key.
      *
-     * @param propertyName the key to look up in the properties file
-     * @return the value of the specified property
-     * @throws IllegalArgumentException if the property key is not found
+     * @param propertyName the property key, e.g. {@code base.url}
+     * @return the value for that key
+     * @throws IllegalArgumentException if the key is missing
      */
     public String getProperty(String propertyName) {
         String value = properties.getProperty(propertyName);
-
         if (value == null) {
-            throw new IllegalArgumentException("Property key not found: " + propertyName);
+            throw new IllegalArgumentException("No config property found for key: " + propertyName);
         }
         return value;
     }
-
 }
-
