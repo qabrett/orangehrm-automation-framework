@@ -1,11 +1,10 @@
 package com.orangehrm.base;
 
-import java.time.Duration;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 import com.orangehrm.config.ConfigReader;
@@ -41,7 +40,7 @@ public class DriverFactory {
         switch (browser) {
             case "chrome":
                 WebDriverManager.chromedriver().setup();
-                webDriver = new ChromeDriver();
+                webDriver = new ChromeDriver(buildChromeOptions());
                 break;
             case "firefox":
                 WebDriverManager.firefoxdriver().setup();
@@ -51,8 +50,24 @@ public class DriverFactory {
                 throw new IllegalArgumentException("Unsupported browser: " + browser);
         }
 
-        webDriver.manage().window().maximize();
         driver.set(webDriver);
+    }
+
+    /**
+     * Builds Chrome-specific configuration.
+     *
+     * <p>A fixed window size is applied at launch via the {@code --window-size}
+     * argument so that headless Chrome honours it. A deterministic viewport keeps
+     * the rendered DOM consistent across local, CI, and Docker environments, which
+     * keeps text- and layout-dependent locators valid everywhere.
+     *
+     * @return configured ChromeOptions
+     */
+    private ChromeOptions buildChromeOptions() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--window-size="
+                + config.getWindowWidth() + "," + config.getWindowHeight());
+        return options;
     }
 
     /**

@@ -37,7 +37,36 @@ public class ConfigReader {
     }
 
     public Duration getExplicitWait() {
-        String seconds = properties.getProperty("explicit.wait.seconds");
-        return Duration.ofSeconds(Long.parseLong(seconds));
+        return Duration.ofSeconds(getRequiredInt("explicit.wait.seconds"));
+    }
+
+    public int getWindowWidth() {
+        return getRequiredInt("browser.window.width");
+    }
+
+    public int getWindowHeight() {
+        return getRequiredInt("browser.window.height");
+    }
+
+    /**
+     * Reads a required integer property, failing fast with a clear message if it
+     * is missing or not a valid number.
+     *
+     * @param key the property key
+     * @return the property value parsed as an int
+     * @throws IllegalStateException if the property is absent or non-numeric
+     */
+    private int getRequiredInt(String key) {
+        String value = properties.getProperty(key);
+        if (value == null) {
+            throw new IllegalStateException(
+                    "Required config property '" + key + "' is missing");
+        }
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalStateException(
+                    "Config property '" + key + "' must be a number but was '" + value + "'", e);
+        }
     }
 }
