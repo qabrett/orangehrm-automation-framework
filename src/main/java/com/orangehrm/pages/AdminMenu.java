@@ -19,12 +19,12 @@ public class AdminMenu extends BasePage {
     /**
      * Navigates to the Job Titles screen via the Job dropdown.
      *
-     * <p>Clicking the Job tab opens the dropdown; the subsequent waited click
-     * resolves once the Job Titles link is present and clickable, so no
-     * intermediate wait is required.
+     * <p>Clicking the Job tab opens an animated dropdown; the Job Titles link is
+     * therefore clicked via {@link #clickWhenStable} so the click retries through
+     * the open-animation rather than racing it.
      */
     public void goToJobTitles() {
         click("adminMenu.job");
-        click("adminMenu.jobTitles");
+        clickWhenStable("adminMenu.jobTitles");
     }
 }

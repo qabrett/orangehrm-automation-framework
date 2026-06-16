@@ -41,4 +41,27 @@ public class JobTitlesPage extends BasePage {
     public boolean isJobTitleListed(String title) {
         return isDisplayed("jobTitles.rowByTitle", title);
     }
+
+    /**
+     * Edits an existing job title: opens its row's edit form, replaces the title,
+     * and saves.
+     *
+     * @param currentTitle the title of the row to edit
+     * @param newTitle     the replacement title
+     */
+    public void editJobTitle(String currentTitle, String newTitle) {
+        click("jobTitles.editIconByTitle", currentTitle);
+        type("jobTitles.titleInput", newTitle);
+        click("jobTitles.save");
+    }
+
+    /**
+     * Deletes an existing job title: clicks its row's delete icon and confirms.
+     *
+     * @param title the title of the row to delete
+     */
+    public void deleteJobTitle(String title) {
+        click("jobTitles.deleteIconByTitle", title);
+        click("jobTitles.deleteConfirm");
+    }
 }
