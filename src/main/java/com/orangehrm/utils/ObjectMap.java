@@ -11,7 +11,8 @@ import org.openqa.selenium.By;
  * names into Selenium {@link By} locators at runtime.
  *
  * <p>Each entry uses the format {@code key = strategy~value}, e.g.
- * {@code login.username = name~username}.
+ * {@code login.username = name~username}. Dynamic entries may contain
+ * {@link String#format} placeholders that are filled at resolution time.
  */
 public class ObjectMap {
 
@@ -33,14 +34,22 @@ public class ObjectMap {
     }
 
     /**
-     * Resolves a logical object name into a Selenium {@link By} locator.
+     * Resolves a logical object name into a Selenium {@link By} locator,
+     * optionally substituting runtime arguments into the locator value.
+     *
+     * <p>For dynamic locators, the value in the repository contains
+     * {@link String#format} placeholders, e.g.
+     * {@code jobTitles.rowByTitle = xpath~//div[@role='row'][.//div[normalize-space()='%s']]}.
+     * The placeholders are filled from {@code args} at resolution time. Static
+     * locators are called with no args and resolve unchanged.
      *
      * @param objectName key in the repository, e.g. {@code login.username}
+     * @param args       runtime values substituted into the locator value, in order
      * @return the {@link By} locator for that object
      * @throws IllegalArgumentException if the key is missing, malformed, or uses
      *                                  an unsupported strategy
      */
-    public By getLocator(String objectName) {
+    public By getLocator(String objectName, Object... args) {
         String locator = properties.getProperty(objectName);
         if (locator == null) {
             throw new IllegalArgumentException("No locator found for key: " + objectName);
@@ -54,6 +63,11 @@ public class ObjectMap {
 
         String strategy = parts[0].trim();
         String value = parts[1].trim();
+
+        if (args.length > 0) {
+            value = String.format(value, args);
+        }
+
         log.debug("Resolving {} -> {}:{}", objectName, strategy, value);
 
         switch (strategy) {

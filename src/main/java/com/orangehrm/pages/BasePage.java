@@ -21,6 +21,9 @@ import com.orangehrm.utils.ObjectMap;
  * <p>The {@link ObjectMap} is static and shared across all pages and threads:
  * locators are read-only after load, so concurrent reads are safe and the file
  * is parsed only once.
+ *
+ * <p>Read-path methods accept optional varargs that are substituted into
+ * dynamic locator templates at resolution time (see {@link ObjectMap}).
  */
 public abstract class BasePage {
 
@@ -42,10 +45,11 @@ public abstract class BasePage {
      * Waits for the element identified by the given locator key to be visible.
      *
      * @param locatorKey key in the locator repository, e.g. {@code login.username}
+     * @param args       optional runtime values for dynamic locator templates
      * @return the visible WebElement
      */
-    protected WebElement waitForElement(String locatorKey) {
-        By locator = resolve(locatorKey);
+    protected WebElement waitForElement(String locatorKey, Object... args) {
+        By locator = resolve(locatorKey, args);
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
@@ -76,18 +80,21 @@ public abstract class BasePage {
     /**
      * Checks whether the element is currently displayed. Returns false rather
      * than throwing if the element is absent.
+     *
+     * @param locatorKey key in the locator repository
+     * @param args       optional runtime values for dynamic locator templates
      */
-    protected boolean isDisplayed(String locatorKey) {
+    protected boolean isDisplayed(String locatorKey, Object... args) {
         try {
-            return waitForElement(locatorKey).isDisplayed();
+            return waitForElement(locatorKey, args).isDisplayed();
         } catch (Exception e) {
             return false;
         }
     }
 
-    private By resolve(String locatorKey) {
+    private By resolve(String locatorKey, Object... args) {
         try {
-            return objectMap.getLocator(locatorKey);
+            return objectMap.getLocator(locatorKey, args);
         } catch (Exception e) {
             throw new IllegalStateException("Could not resolve locator: " + locatorKey, e);
         }
